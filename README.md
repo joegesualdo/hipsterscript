@@ -1,6 +1,11 @@
 ## Hipsterscript
 > The most hipster DSL for creating virtual trees.
 
+## Install
+```
+$ npm install --save hipsterscript 
+```
+
 ## Example
 ```javascript
 var h = require("hipsterscript");
