@@ -1,4 +1,4 @@
-var document = document || require("./dom.js").document
+var document = document || require("server-dom").document
 
 function parseSelector(string) {
   var attrArray = string.split(/([\.#]?[^\s#.]+)/)
