@@ -1,18 +1,18 @@
 var document = document || require("server-dom").document
 
 function parseSelector(string) {
-  var attrArray = string.split(/([\.#]?[^\s#.]+)/)
-  // removes the spaces
-  attrArray = attrArray.filter(Boolean)
   var el;
   var classString = '';
   var idString = '';
+  var attrArray = string.split(/([\.#]?[^\s#.]+)/)
+  // removes the spaces
+  attrArray = attrArray.filter(Boolean)
 
   if (/^\.|#/.test(attrArray[0])) {
-    el = 'div'
+    el = 'div';
   } else {
-    el = attrArray[0]
-    attrArray = attrArray.splice(1)
+    el = attrArray[0];
+    attrArray = attrArray.splice(1);
   }
 
   attrArray.forEach(function(v) {
@@ -29,6 +29,7 @@ function parseSelector(string) {
 
   idString = idString.trim()
   classString = classString.trim()
+
   return {
     el: el,
     id: idString,
@@ -49,7 +50,9 @@ function createDOMElement(string) {
 }
 
 function isNode(el) {
-  if (el !== undefined && el.nodeName !== undefined && el.nodeType !== undefined) {
+  if (el !== undefined &&
+      el.nodeName !== undefined &&
+      el.nodeType !== undefined) {
     return true;
   } else {
     return false
@@ -58,14 +61,16 @@ function isNode(el) {
 
 function areNodes(elArray) {
   elArray.forEach(function(el) {
-    if (el !== undefined && el.nodeName !== undefined && el.nodeType !== undefined) {
+    if (el !== undefined &&
+        el.nodeName !== undefined &&
+        el.nodeType !== undefined) {
       return false
     }
   });
   return true;
 }
 
-// returns an array of function that we use later to remove the events attached
+// Returns an array of function that we use later to remove the events attached
 function applyAttributes(el, attrObject) {
   var e = el;
   var l = attrObject;
@@ -74,11 +79,11 @@ function applyAttributes(el, attrObject) {
 
   for (var attrName in attrObject) {
     var attrValue = attrObject[attrName];
-    if(typeof attrValue === 'function') {
+    if (typeof attrValue === 'function') {
       // check if it starts with 'on'
       var isEventHandler = /^on\w+/.test(attrName);
 
-      if(isEventHandler) {
+      if (isEventHandler) {
         // remove the 'on'
         var eventName = attrName.slice(2);
         (function (attrName, attrObject) { // capture k, l in the closure
@@ -102,20 +107,21 @@ function applyAttributes(el, attrObject) {
         }))
       }
     }
-    else if(attrName === 'style') {
+    else if (attrName === 'style') {
       if('string' === typeof attrObject[attrName]) {
         e.style.cssText = attrObject[attrName]
-      }else{
+      } else {
         for (var style in attrObject[attrName]){
           (function(s, v) {
-            if('function' === typeof v) {
+            if ('function' === typeof v) {
               // observable
               e.style.setProperty(style, v())
               cleanupFuncs.push(v(function (val) {
                 e.style.setProperty(style, val)
               }))
-            } else
+            } else {
               e.style.setProperty(style, attrObject[attrName][style])
+            }
           })(style, attrObject[attrName][style])
         }
       }
@@ -130,26 +136,34 @@ function applyAttributes(el, attrObject) {
 
 function h(selector, properties, children) {
   var childNodes = []
-  if (children === undefined && properties !== undefined && areNodes(properties)) {
+  var el = null;
+
+  if (children === undefined &&
+      properties !== undefined &&
+      areNodes(properties)) {
     childNodes = properties;
   } else if (children !== undefined){
     childNodes = children;
   }
-  var el = null;
+
   if (el === null) {
     el = createDOMElement(selector);
   } else {
     el.appendChild(createDOMElement(selector));
   }
+
   childNodes.forEach(function(childNode){
     el.appendChild(childNode);
   })
+
   applyAttributes(el, properties);
+
   return el;
 }
 
-function render(elToAdd, baseEl){
-  baseEl.appendChild(elToAdd);
-}
+// TODO: Implement a render function
+// function render(elToAdd, baseEl){
+//   baseEl.appendChild(elToAdd);
+// }
 
 module.exports = h
